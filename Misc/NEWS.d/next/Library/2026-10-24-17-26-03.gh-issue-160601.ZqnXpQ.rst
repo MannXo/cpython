@@ -1,0 +1,3 @@
+Fix :mod:`profiling.sampling` in ``--binary`` mode raising
+:exc:`UnicodeEncodeError` when a sampled file or function name contains a
+lone surrogate. Such names now round-trip through the binary format.

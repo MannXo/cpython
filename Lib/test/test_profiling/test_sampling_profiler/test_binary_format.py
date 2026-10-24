@@ -739,6 +739,18 @@ class TestBinaryEdgeCases(BinaryFormatTestBase):
                 self.assertEqual(count, 1)
                 self.assert_samples_equal(samples, collector)
 
+    def test_lone_surrogate_names(self):
+        # gh-160601: undecodable file names and runtime-built names can
+        # contain lone surrogates.
+        frames = [
+            make_frame("/chemin/caf\udce9.py", 1, "func"),
+            make_frame("test.py", 2, "func\uddd0"),
+        ]
+        samples = [[make_interpreter(0, [make_thread(1, frames)])]]
+        collector, count = self.roundtrip(samples)
+        self.assertEqual(count, 1)
+        self.assert_samples_equal(samples, collector)
+
     def test_special_char_filenames(self):
         """Filenames with special characters roundtrip exactly."""
         filenames = [

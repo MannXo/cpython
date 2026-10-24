@@ -389,7 +389,15 @@ reader_parse_string_table(BinaryReader *reader, const uint8_t *data, size_t file
             return -1;
         }
 
-        reader->strings[i] = PyUnicode_DecodeUTF8((char *)&data[offset], str_len, "replace");
+        const char *str_data = (const char *)&data[offset];
+        reader->strings[i] = PyUnicode_DecodeUTF8(str_data, str_len,
+                                                  "surrogatepass");
+        if (!reader->strings[i]
+            && PyErr_ExceptionMatches(PyExc_UnicodeDecodeError)) {
+            PyErr_Clear();
+            reader->strings[i] = PyUnicode_DecodeUTF8(str_data, str_len,
+                                                      "replace");
+        }
         if (!reader->strings[i]) {
             return -1;
         }
